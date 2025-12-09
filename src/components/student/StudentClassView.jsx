@@ -11,6 +11,7 @@ export default function StudentClassView({ classData, onBack, onTakeQuiz }) {
   const [activeTab, setActiveTab] = useState('quizzes'); // 'quizzes' or 'lessons'
   const [viewMode, setViewMode] = useState('all'); // 'all', 'completed', 'missing'
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState(null);
 
   useEffect(() => {
     fetchQuizzesAndResults();
@@ -379,37 +380,38 @@ export default function StudentClassView({ classData, onBack, onTakeQuiz }) {
               ) : (
                 <div className="space-y-4">
                   {lessons.map((lesson) => (
-                    <div key={lesson.id} className="p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-3">{lesson.title}</h3>
-                      
-                      {lesson.content && (
-                        <p className="text-gray-700 mb-4 whitespace-pre-wrap">{lesson.content}</p>
-                      )}
+                    <div key={lesson.id} className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition cursor-pointer" onClick={() => setSelectedLesson(lesson)}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold text-gray-800 mb-2">{lesson.title}</h3>
+                          
+                          {lesson.content && (
+                            <p className="text-gray-600 mb-3 line-clamp-2">{lesson.content}</p>
+                          )}
 
-                      {lesson.links && lesson.links.length > 0 && (
-                        <div className="mb-4">
-                          <p className="text-sm font-semibold text-gray-700 mb-2">🔗 Links:</p>
-                          <div className="space-y-2">
-                            {lesson.links.map((link, index) => (
-                              <a
-                                key={index}
-                                href={link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition"
-                              >
-                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {new Date(lesson.createdAt).toLocaleDateString()}
+                            </span>
+                            {lesson.links && lesson.links.length > 0 && (
+                              <span className="flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                 </svg>
-                                <span className="text-green-700 font-medium break-all">{link}</span>
-                              </a>
-                            ))}
+                                {lesson.links.length} link{lesson.links.length > 1 ? 's' : ''}
+                              </span>
+                            )}
                           </div>
                         </div>
-                      )}
-
-                      <div className="text-xs text-gray-500 pt-3 border-t border-gray-200">
-                        Posted on {new Date(lesson.createdAt).toLocaleDateString()} at {new Date(lesson.createdAt).toLocaleTimeString()}
+                        <button className="ml-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center gap-2">
+                          <span>Read</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -419,6 +421,101 @@ export default function StudentClassView({ classData, onBack, onTakeQuiz }) {
           )}
         </div>
       </main>
+
+      {/* Lesson Modal */}
+      {selectedLesson && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedLesson(null)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold mb-2">{selectedLesson.title}</h2>
+                  <p className="text-green-100 text-sm">
+                    Posted on {new Date(selectedLesson.createdAt).toLocaleDateString()} at {new Date(selectedLesson.createdAt).toLocaleTimeString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedLesson(null)}
+                  className="text-white hover:bg-green-800 rounded-lg p-2 transition"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+              {selectedLesson.content && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Lesson Content
+                  </h3>
+                  <div className="prose max-w-none">
+                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{selectedLesson.content}</p>
+                  </div>
+                </div>
+              )}
+
+              {selectedLesson.links && selectedLesson.links.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    Resources & Links
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedLesson.links.map((link, index) => (
+                      <a
+                        key={index}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition group"
+                      >
+                        <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-green-700 font-medium break-all group-hover:text-green-800">{link}</p>
+                          <p className="text-xs text-green-600">Click to open in new tab</p>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!selectedLesson.content && (!selectedLesson.links || selectedLesson.links.length === 0) && (
+                <div className="text-center py-8 text-gray-500">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p>No content available for this lesson</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+              <button
+                onClick={() => setSelectedLesson(null)}
+                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
