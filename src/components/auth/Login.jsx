@@ -99,7 +99,7 @@ if (userDoc.exists()) {
 
   const handleResendVerification = async () => {
     try {
-      const { resendVerificationEmail } = await import('../../services/authService');
+      const { resendVerificationEmail } = await import('../../services/AuthService');
       await resendVerificationEmail();
       alert('Verification email sent! Please check your inbox.');
     } catch (error) {
