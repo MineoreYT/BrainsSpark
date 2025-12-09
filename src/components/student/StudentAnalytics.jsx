@@ -65,9 +65,9 @@ export default function StudentAnalytics({ classId, onBack }) {
       ? Math.round(resultsData.reduce((sum, r) => sum + r.score, 0) / resultsData.length)
       : 0;
 
-    // Calculate completion rate
+    // Calculate completion rate (cap at 100%)
     const completionRate = quizzesAvailable > 0
-      ? Math.round((quizzesTaken / quizzesAvailable) * 100)
+      ? Math.min(100, Math.round((quizzesTaken / quizzesAvailable) * 100))
       : 0;
 
     // Create progress data (scores over time)
@@ -92,16 +92,27 @@ export default function StudentAnalytics({ classId, onBack }) {
       };
     });
 
-    // Calculate trend
+    // Calculate trend - only if we have at least 3 quizzes
     let trend = 'stable';
     if (progressData.length >= 3) {
       const recent = progressData.slice(-3);
       const avgRecent = recent.reduce((sum, r) => sum + r.score, 0) / recent.length;
       const older = progressData.slice(0, -3);
-      const avgOlder = older.length > 0 ? older.reduce((sum, r) => sum + r.score, 0) / older.length : avgRecent;
       
-      if (avgRecent > avgOlder + 5) trend = 'improving';
-      else if (avgRecent < avgOlder - 5) trend = 'declining';
+      // Only compare if we have older data
+      if (older.length > 0) {
+        const avgOlder = older.reduce((sum, r) => sum + r.score, 0) / older.length;
+        
+        if (avgRecent > avgOlder + 5) trend = 'improving';
+        else if (avgRecent < avgOlder - 5) trend = 'declining';
+      }
+    } else if (progressData.length >= 2) {
+      // If only 2 quizzes, compare them directly
+      const lastScore = progressData[progressData.length - 1].score;
+      const firstScore = progressData[0].score;
+      
+      if (lastScore > firstScore + 5) trend = 'improving';
+      else if (lastScore < firstScore - 5) trend = 'declining';
     }
 
     setAnalytics({
