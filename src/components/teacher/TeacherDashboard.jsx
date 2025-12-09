@@ -363,7 +363,7 @@ export default function TeacherDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-indigo-600">Quizzie</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-indigo-600">BrainSpark</h1>
               <span className="ml-3 sm:ml-4 px-2 sm:px-3 py-1 bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-medium rounded-full">
                 Teacher
               </span>

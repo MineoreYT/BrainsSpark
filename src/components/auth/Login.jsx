@@ -111,7 +111,7 @@ if (userDoc.exists()) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-indigo-600 mb-2">Quizzie</h1>
+          <h1 className="text-3xl font-bold text-indigo-600 mb-2">BrainSpark</h1>
           <p className="text-gray-600">Welcome back! Please login to your account</p>
         </div>
 

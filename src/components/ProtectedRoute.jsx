@@ -57,7 +57,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Email Verification Required</h2>
           <p className="text-gray-600 mb-4">
-            Please verify your email address to access Quizzie. Check your inbox for the verification link.
+            Please verify your email address to access BrainSpark. Check your inbox for the verification link.
           </p>
           <p className="text-sm text-gray-500 mb-6">
             Email: <span className="font-semibold">{currentUser.email}</span>
