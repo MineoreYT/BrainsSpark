@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
-import { resendVerificationEmail } from '../services/authService';
+import { resendVerificationEmail } from '../services/AuthService';
 import { auth } from '../config/firebase';
 
 export default function ProtectedRoute({ children, requiredRole }) {
