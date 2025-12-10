@@ -77,9 +77,19 @@ export default function Analytics({ classId, onBack }) {
     const totalStudents = studentData.length;
     const totalQuizzes = quizData.length;
 
-    // Filter results to only include current students
+    // Filter results to only include current students and get latest submission per student per quiz
     const currentStudentIds = studentData.map(s => s.id);
-    const currentStudentSubmissions = resultsData.filter(r => currentStudentIds.includes(r.studentId));
+    const allCurrentSubmissions = resultsData.filter(r => currentStudentIds.includes(r.studentId));
+    
+    // Get only the latest submission per student per quiz (in case of retakes)
+    const latestSubmissions = {};
+    allCurrentSubmissions.forEach(result => {
+      const key = `${result.studentId}-${result.quizId}`;
+      if (!latestSubmissions[key] || new Date(result.submittedAt) > new Date(latestSubmissions[key].submittedAt)) {
+        latestSubmissions[key] = result;
+      }
+    });
+    const currentStudentSubmissions = Object.values(latestSubmissions);
 
     // Calculate class average (only current students)
     const classAverage = currentStudentSubmissions.length > 0
@@ -107,7 +117,7 @@ export default function Analytics({ classId, onBack }) {
 
     // Calculate student progress (for each student, get their average)
     const studentProgress = studentData.map(student => {
-      const studentResults = resultsData.filter(r => r.studentId === student.id);
+      const studentResults = currentStudentSubmissions.filter(r => r.studentId === student.id);
       const average = studentResults.length > 0
         ? Math.round(studentResults.reduce((sum, r) => sum + r.score, 0) / studentResults.length)
         : 0;
