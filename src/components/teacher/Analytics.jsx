@@ -77,20 +77,24 @@ export default function Analytics({ classId, onBack }) {
     const totalStudents = studentData.length;
     const totalQuizzes = quizData.length;
 
-    // Calculate class average
-    const classAverage = resultsData.length > 0
-      ? Math.round(resultsData.reduce((sum, r) => sum + r.score, 0) / resultsData.length)
+    // Filter results to only include current students
+    const currentStudentIds = studentData.map(s => s.id);
+    const currentStudentSubmissions = resultsData.filter(r => currentStudentIds.includes(r.studentId));
+
+    // Calculate class average (only current students)
+    const classAverage = currentStudentSubmissions.length > 0
+      ? Math.round(currentStudentSubmissions.reduce((sum, r) => sum + r.score, 0) / currentStudentSubmissions.length)
       : 0;
 
-    // Calculate completion rate
+    // Calculate completion rate (only count submissions from current students)
     const totalPossibleSubmissions = totalStudents * totalQuizzes;
     const completionRate = totalPossibleSubmissions > 0
-      ? Math.round((resultsData.length / totalPossibleSubmissions) * 100)
+      ? Math.min(100, Math.round((currentStudentSubmissions.length / totalPossibleSubmissions) * 100))
       : 0;
 
-    // Calculate quiz averages
+    // Calculate quiz averages (only current students)
     const quizAverages = quizData.map(quiz => {
-      const quizResults = resultsData.filter(r => r.quizId === quiz.id);
+      const quizResults = currentStudentSubmissions.filter(r => r.quizId === quiz.id);
       const average = quizResults.length > 0
         ? Math.round(quizResults.reduce((sum, r) => sum + r.score, 0) / quizResults.length)
         : 0;
