@@ -147,12 +147,20 @@ export const sanitizeQuizQuestion = (question) => {
     return null;
   }
   
-  return {
+  const sanitized = {
+    type: question.type || 'multiple-choice',
     question: sanitizeText(question.question, 500),
-    options: sanitizeArray(question.options, 200).slice(0, 6), // Max 6 options
-    correctAnswer: sanitizeText(question.correctAnswer, 200),
-    points: sanitizeNumber(question.points, 1, 100),
   };
+  
+  if (question.type === 'multiple-choice') {
+    sanitized.options = sanitizeArray(question.options, 200).slice(0, 6); // Max 6 options
+    sanitized.correctAnswer = sanitizeNumber(question.correctAnswer, 0, 5); // Index 0-5
+  } else {
+    // Text/enumeration question
+    sanitized.correctAnswer = sanitizeText(question.correctAnswer, 200);
+  }
+  
+  return sanitized;
 };
 
 /**
