@@ -85,16 +85,31 @@ export default function ClassDetails({ classId, onBack }) {
     setConfirmModal({
       isOpen: true,
       title: 'Remove Student',
-      message: `Are you sure you want to remove ${studentName} from this class?`,
+      message: `Are you sure you want to remove ${studentName} from this class?\n\nThis will also delete all their quiz results for this class.`,
       onConfirm: () => performRemoveStudent(studentId, studentName)
     });
   };
 
   const performRemoveStudent = async (studentId, studentName) => {
     try {
+      // Remove student from class
       await updateDoc(doc(db, 'classes', classId), {
         students: arrayRemove(studentId)
       });
+
+      // Clean up orphaned quiz results for this student in this class
+      const resultsQuery = query(
+        collection(db, 'quizResults'), 
+        where('studentId', '==', studentId),
+        where('classId', '==', classId)
+      );
+      const resultsSnapshot = await getDocs(resultsQuery);
+      
+      if (!resultsSnapshot.empty) {
+        const deletePromises = resultsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+        console.log(`Cleaned up ${resultsSnapshot.docs.length} quiz results for removed student`);
+      }
 
       setStudents(students.filter(s => s.id !== studentId));
       showToast(`${studentName} removed successfully`, 'success');
