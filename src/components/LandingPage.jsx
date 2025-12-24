@@ -54,10 +54,10 @@ export default function LandingPage() {
                 Start Free Today →
               </button>
               <button
-                onClick={() => document.getElementById('demo').scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
                 className="px-8 py-4 bg-white text-indigo-600 border-2 border-indigo-600 rounded-lg hover:bg-indigo-50 transition font-semibold text-lg"
               >
-                Watch Demo
+                Learn More
               </button>
             </div>
             <p className="text-sm text-gray-500 mt-4">
@@ -65,14 +65,83 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Hero Image Placeholder */}
+          {/* App Mockup */}
           <div className="mt-16 bg-white rounded-xl shadow-2xl p-4 max-w-5xl mx-auto">
-            <div className="aspect-video bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <svg className="w-24 h-24 text-indigo-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p className="text-gray-600 font-medium">App Screenshot Here</p>
+            <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
+              {/* Browser Chrome */}
+              <div className="bg-gray-200 px-4 py-2 flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                </div>
+                <div className="flex-1 bg-white rounded px-3 py-1 text-xs text-gray-600 ml-4">
+                  brainspark.app/teacher/dashboard
+                </div>
+              </div>
+              
+              {/* App Interface */}
+              <div className="bg-white h-full p-6">
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">BS</span>
+                    </div>
+                    <h1 className="text-xl font-bold text-gray-900">Teacher Dashboard</h1>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                    <span className="text-sm text-gray-600">Ms. Johnson</span>
+                  </div>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-4 gap-4 mb-6">
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">12</div>
+                    <div className="text-xs text-blue-600">Active Quizzes</div>
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">156</div>
+                    <div className="text-xs text-green-600">Students</div>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600">89%</div>
+                    <div className="text-xs text-purple-600">Avg Score</div>
+                  </div>
+                  <div className="bg-orange-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600">5</div>
+                    <div className="text-xs text-orange-600">Classes</div>
+                  </div>
+                </div>
+
+                {/* Recent Quizzes */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3">Recent Quizzes</h3>
+                  <div className="space-y-2">
+                    <div className="bg-white p-3 rounded flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-sm">Chapter 5: Photosynthesis</div>
+                        <div className="text-xs text-gray-500">Biology • 15 questions</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-green-600">92% avg</div>
+                        <div className="text-xs text-gray-500">28 responses</div>
+                      </div>
+                    </div>
+                    <div className="bg-white p-3 rounded flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-sm">World War II Timeline</div>
+                        <div className="text-xs text-gray-500">History • 20 questions</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-blue-600">85% avg</div>
+                        <div className="text-xs text-gray-500">31 responses</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -80,7 +149,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Everything You Need</h2>
@@ -206,28 +275,6 @@ export default function LandingPage() {
               <p className="text-gray-600">
                 Create quizzes, post lessons, and watch your students learn!
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Demo Video Section */}
-      <section id="demo" className="py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">See It In Action</h2>
-            <p className="text-xl text-gray-600">Watch how easy it is to create and share quizzes</p>
-          </div>
-
-          <div className="bg-gray-900 rounded-xl shadow-2xl overflow-hidden">
-            <div className="aspect-video bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
-              <div className="text-center text-white">
-                <svg className="w-24 h-24 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                <p className="text-xl font-medium">Demo Video Coming Soon</p>
-                <p className="text-sm opacity-75 mt-2">2-minute walkthrough of BrainSpark</p>
-              </div>
             </div>
           </div>
         </div>
