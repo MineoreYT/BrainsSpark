@@ -27,6 +27,14 @@ jobs:
 
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+
+    - name: Install additional SDK components
+      run: |
+        sdkmanager "platforms;android-35" "build-tools;35.0.0" || true
+        sdkmanager "platforms;android-36" "build-tools;36.0.0" || true
 
     - name: Install npm dependencies
       run: npm ci
@@ -37,17 +45,23 @@ jobs:
     - name: Capacitor sync
       run: npx cap sync android
 
-    - name: Fix Android SDK versions
+    - name: Try SDK 35 first, fallback to compatible versions
       run: |
-        # Ensure we're using SDK 34 which is available
-        sed -i 's/compileSdkVersion = 36/compileSdkVersion = 34/g' android/variables.gradle
-        sed -i 's/targetSdkVersion = 36/targetSdkVersion = 34/g' android/variables.gradle
+        # First try with SDK 35 if available
+        if sdkmanager --list | grep -q "platforms;android-35"; then
+          echo "Using Android SDK 35"
+          sed -i 's/compileSdkVersion = 34/compileSdkVersion = 35/g' android/variables.gradle
+          sed -i 's/targetSdkVersion = 34/targetSdkVersion = 34/g' android/variables.gradle
+        else
+          echo "Using compatible library versions for SDK 34"
+          # Use the downgraded versions we set
+        fi
 
     - name: Build APK
       run: |
         cd android
         chmod +x ./gradlew
-        ./gradlew assembleDebug --no-daemon
+        ./gradlew assembleDebug --no-daemon --stacktrace
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
