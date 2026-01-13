@@ -1,11 +1,66 @@
+const rateLimit = require('express-rate-limit');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const express = require('express');
 
 admin.initializeApp();
 const db = admin.firestore();
+const app = express();
+
+// Rate limiting middleware
+const createAccountLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 account creations per windowMs
+  message: {
+    error: 'Too many accounts created from this IP, please try again after 15 minutes.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 login attempts per windowMs
+  message: {
+    error: 'Too many login attempts from this IP, please try again after 15 minutes.'
+  },
+  skipSuccessfulRequests: true,
+});
+
+const quizSubmissionLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 20, // limit each IP to 20 quiz submissions per 5 minutes
+  message: {
+    error: 'Too many quiz submissions from this IP, please try again later.'
+  },
+});
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again later.'
+  },
+});
+
+// Apply rate limiting middleware
+app.use(express.json());
+app.use('/api/', generalLimiter);
+
+// Example routes with rate limiting (you can add actual logic here if needed)
+app.post('/api/register', createAccountLimiter, (req, res) => {
+  res.status(501).json({ message: 'Registration endpoint - implement if needed' });
+});
+
+app.post('/api/login', loginLimiter, (req, res) => {
+  res.status(501).json({ message: 'Login endpoint - implement if needed' });
+});
+
+// Export the Express app as a Cloud Function
+exports.api = functions.https.onRequest(app);
 
 /**
- * Submit Quiz - Server-side validation
+ * Submit Quiz - Server-side validation with rate limiting
  * This function validates quiz answers on the server to prevent cheating
  * Students never see the correct answers in the client
  */
@@ -30,6 +85,20 @@ exports.submitQuiz = functions.https.onCall(async (data, context) => {
   }
 
   try {
+    // Check for rate limiting on quiz submissions per user
+    const recentSubmissions = await db
+      .collection('quizResults')
+      .where('studentId', '==', studentId)
+      .where('submittedAt', '>', new Date(Date.now() - 5 * 60 * 1000)) // Last 5 minutes
+      .get();
+
+    if (recentSubmissions.size >= 5) {
+      throw new functions.https.HttpsError(
+        'resource-exhausted',
+        'Too many quiz submissions. Please wait before submitting another quiz.'
+      );
+    }
+
     // Fetch the quiz from Firestore
     const quizDoc = await db.collection('quizzes').doc(quizId).get();
     
@@ -150,7 +219,7 @@ exports.submitQuiz = functions.https.onCall(async (data, context) => {
 });
 
 /**
- * Get Quiz Questions (without answers)
+ * Get Quiz Questions (without answers) with rate limiting
  * This function returns quiz questions without the correct answers
  */
 exports.getQuizQuestions = functions.https.onCall(async (data, context) => {
@@ -163,6 +232,7 @@ exports.getQuizQuestions = functions.https.onCall(async (data, context) => {
   }
 
   const { quizId } = data;
+  const userId = context.auth.uid;
 
   if (!quizId) {
     throw new functions.https.HttpsError(
@@ -172,6 +242,27 @@ exports.getQuizQuestions = functions.https.onCall(async (data, context) => {
   }
 
   try {
+    // Rate limiting: Check if user has made too many quiz requests recently
+    const recentRequests = await db
+      .collection('quizRequests')
+      .where('userId', '==', userId)
+      .where('requestedAt', '>', new Date(Date.now() - 5 * 60 * 1000)) // Last 5 minutes
+      .get();
+
+    if (recentRequests.size >= 10) {
+      throw new functions.https.HttpsError(
+        'resource-exhausted',
+        'Too many quiz requests. Please wait before requesting another quiz.'
+      );
+    }
+
+    // Log the request for rate limiting
+    await db.collection('quizRequests').add({
+      userId: userId,
+      quizId: quizId,
+      requestedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
     const quizDoc = await db.collection('quizzes').doc(quizId).get();
     
     if (!quizDoc.exists) {
