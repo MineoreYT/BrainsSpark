@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
+import { App as CapacitorApp } from '@capacitor/app';
 import TakeQuiz from './TakeQuiz';
 import StudentClassView from './StudentClassView';
 import Toast from '../Toast';
@@ -23,6 +24,38 @@ export default function StudentDashboard() {
     fetchUserData();
     fetchClasses();
   }, []);
+
+  // Handle Android back button for sub-pages
+  useEffect(() => {
+    const handleBackButton = CapacitorApp.addListener('backButton', () => {
+      // If viewing a class, go back to dashboard
+      if (selectedClassForView) {
+        setSelectedClassForView(null);
+        return;
+      }
+      
+      // If taking a quiz, go back to dashboard
+      if (selectedClassForQuiz) {
+        setSelectedClassForQuiz(null);
+        return;
+      }
+      
+      // If showing join modal, close it
+      if (showJoinModal) {
+        setShowJoinModal(false);
+        return;
+      }
+      
+      // If on main dashboard, show exit confirmation
+      if (window.confirm('Do you want to exit the app?')) {
+        CapacitorApp.exitApp();
+      }
+    });
+
+    return () => {
+      handleBackButton.remove();
+    };
+  }, [selectedClassForView, selectedClassForQuiz, showJoinModal]);
 
   const fetchUserData = async () => {
     try {

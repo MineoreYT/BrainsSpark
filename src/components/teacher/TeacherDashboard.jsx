@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, addDoc, query, where, getDocs, doc, getDoc, deleteDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
+import { App as CapacitorApp } from '@capacitor/app';
 import ClassDetails from './ClassDetails';
 import Toast from '../Toast';
 import ConfirmModal from '../ConfirmModal';
@@ -51,6 +52,50 @@ export default function TeacherDashboard() {
     fetchUserData();
     fetchClasses();
   }, []);
+
+  // Handle Android back button for sub-pages
+  useEffect(() => {
+    const handleBackButton = CapacitorApp.addListener('backButton', () => {
+      // If showing templates page, go back to dashboard
+      if (showTemplatesPage) {
+        setShowTemplatesPage(false);
+        return;
+      }
+      
+      // If showing class details, go back to dashboard
+      if (selectedClassForDetails) {
+        setSelectedClassForDetails(null);
+        return;
+      }
+      
+      // If showing any modal, close it
+      if (showCreateModal) {
+        setShowCreateModal(false);
+        return;
+      }
+      if (showQuizModal) {
+        setShowQuizModal(false);
+        return;
+      }
+      if (showLessonModal) {
+        setShowLessonModal(false);
+        return;
+      }
+      if (showSaveTemplateModal) {
+        setShowSaveTemplateModal(false);
+        return;
+      }
+      
+      // If on main dashboard, show exit confirmation
+      if (window.confirm('Do you want to exit the app?')) {
+        CapacitorApp.exitApp();
+      }
+    });
+
+    return () => {
+      handleBackButton.remove();
+    };
+  }, [showTemplatesPage, selectedClassForDetails, showCreateModal, showQuizModal, showLessonModal, showSaveTemplateModal]);
 
   // Update total points when questions change
   useEffect(() => {
