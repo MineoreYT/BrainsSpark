@@ -375,25 +375,25 @@ export default function Analytics({ classId, onBack }) {
               <h1 className="text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
               <p className="text-gray-600 text-sm">{classData?.name}</p>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleExportGradebook}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
-                title="Export complete gradebook with all quizzes"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export All Quizzes
-              </button>
+            <div className="flex gap-3">
               <button
                 onClick={handleRefresh}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center gap-2"
+                className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                title="Refresh analytics data"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                Refresh
+              </button>
+              <button
+                onClick={handleExportGradebook}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+                title="Export gradebook"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export Gradebook
               </button>
             </div>
           </div>
@@ -649,14 +649,14 @@ export default function Analytics({ classId, onBack }) {
       {/* Export Modal */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-800">Export Gradebook</h3>
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800">Export Gradebook</h3>
               <button
                 onClick={() => setShowExportModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -718,16 +718,16 @@ export default function Analytics({ classId, onBack }) {
               )}
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
-                  <strong>Export Format:</strong> Vertical layout with student name, email, quiz name, and points per row.
+                <p className="text-xs text-blue-800">
+                  Vertical layout with student name, email, quiz name, and points per row.
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-3 pt-6 border-t mt-6">
+            <div className="flex gap-3 pt-4 mt-4 border-t">
               <button
                 onClick={() => setShowExportModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
               >
                 Cancel
               </button>
@@ -737,7 +737,7 @@ export default function Analytics({ classId, onBack }) {
                   (exportType === 'dateRange' && (!exportStartDate || !exportEndDate)) ||
                   (exportType === 'specificQuiz' && !selectedQuizForExport)
                 }
-                className={`flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium ${
+                className={`flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition ${
                   (exportType === 'dateRange' && (!exportStartDate || !exportEndDate)) ||
                   (exportType === 'specificQuiz' && !selectedQuizForExport)
                     ? 'opacity-50 cursor-not-allowed' : ''

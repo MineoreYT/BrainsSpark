@@ -1,10 +1,13 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 export function useToast() {
   const [toasts, setToasts] = useState([]);
+  const counterRef = useRef(0);
 
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
-    const id = Date.now();
+    // Use a combination of timestamp and counter to ensure unique IDs
+    counterRef.current += 1;
+    const id = `${Date.now()}-${counterRef.current}`;
     setToasts(prev => [...prev, { id, message, type, duration }]);
   }, []);
 

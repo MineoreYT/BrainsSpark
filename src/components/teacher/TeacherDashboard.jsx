@@ -7,6 +7,7 @@ import ConfirmModal from '../ConfirmModal';
 import { useToast } from '../../hooks/useToast';
 import { sanitizeText, sanitizeUrl } from '../../utils/sanitize';
 import { DEFAULT_GRADING_SCALES, calculateTotalPoints } from '../../utils/grading';
+import { MyTemplatesPage, SaveTemplateModal } from '../templates';
 
 export default function TeacherDashboard() {
   const [classes, setClasses] = useState([]);
@@ -15,6 +16,8 @@ export default function TeacherDashboard() {
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedClassForDetails, setSelectedClassForDetails] = useState(null);
+  const [showTemplatesPage, setShowTemplatesPage] = useState(false);
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
   const [newClassName, setNewClassName] = useState('');
   const [newClassDescription, setNewClassDescription] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -465,6 +468,15 @@ export default function TeacherDashboard() {
     );
   }
 
+  // Show Templates Page
+  if (showTemplatesPage) {
+    return (
+      <MyTemplatesPage 
+        onBack={() => setShowTemplatesPage(false)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
@@ -492,15 +504,26 @@ export default function TeacherDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800">My Classes</h2>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
-          >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Create New Class
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => setShowTemplatesPage(true)}
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              My Templates
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Create New Class
+            </button>
+          </div>
         </div>
 
         {classes.length === 0 ? (
@@ -875,6 +898,23 @@ export default function TeacherDashboard() {
                 Cancel
               </button>
               <button
+                onClick={() => {
+                  // Prepare quiz data for template
+                  const quizData = {
+                    title: quizTitle,
+                    questions: questions,
+                    gradingScale: gradingScale,
+                    passingGrade: passingGrade,
+                    totalPoints: totalPoints
+                  };
+                  setShowSaveTemplateModal(true);
+                }}
+                disabled={!quizTitle.trim() || questions.length === 0}
+                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save as Template
+              </button>
+              <button
                 onClick={handleCreateQuiz}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
               >
@@ -884,6 +924,24 @@ export default function TeacherDashboard() {
           </div>
         </div>
       )}
+
+      {/* Save Template Modal */}
+      <SaveTemplateModal
+        isOpen={showSaveTemplateModal}
+        onClose={() => setShowSaveTemplateModal(false)}
+        quizData={{
+          title: quizTitle,
+          questions: questions,
+          gradingScale: gradingScale,
+          passingGrade: passingGrade,
+          totalPoints: totalPoints
+        }}
+        userName={userName}
+        onSuccess={(template) => {
+          showToast(`Template "${template.name}" saved successfully!`, 'success');
+          setShowSaveTemplateModal(false);
+        }}
+      />
 
       {showLessonModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
