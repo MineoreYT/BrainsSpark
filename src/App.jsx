@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import LandingPage from './components/LandingPage';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import TeacherDashboard from './components/teacher/TeacherDashboard';
 import StudentDashboard from './components/student/StudentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           
           <Route 
             path="/teacher/dashboard" 
